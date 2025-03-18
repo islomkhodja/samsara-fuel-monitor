@@ -2,7 +2,7 @@
 
 Samsara Fuel Monitor is a fleet management dashboard designed to track fuel levels, engine status, and locations of vehicles in real-time. This project provides a user-friendly interface to monitor and filter vehicle data efficiently.
 
-![img.png](img.png)
+![Overview](screenshot.png)
 
 ## Features
 
