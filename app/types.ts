@@ -65,7 +65,7 @@ export interface SamsaraVehicleUI {
 }
 
 export interface SamsaraResponse {
-  data: SamsaraVehicle[]
+  data: SamsaraVehicleUI[]
   pagination: {
     endCursor: string
     hasNextPage: boolean
