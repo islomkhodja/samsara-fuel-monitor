@@ -1,47 +1,42 @@
 import { NextResponse } from "next/server"
-import {SamsaraResponse, SamsaraVehicle, SamsaraVehicleUI} from "@/app/types";
-
-
+import { SamsaraResponse, SamsaraVehicle, SamsaraVehicleUI } from "@/app/types";
 
 // This is a mock API route that returns the Samsara vehicle data
 // In a real application, this would make a request to the Samsara API
 export async function GET() {
-  // This is the data from the attachment
+  // Fetch vehicle stats from both tokens and combine the results
   const data = await fetchVehicleStats();
-
-  return NextResponse.json(data)
+  return NextResponse.json(data);
 }
 
 // Check if a date is within the last two days
 const isWithinLastTwoDays = (dateString: string): boolean => {
-  const date = new Date(dateString)
-  const twoDaysAgo = new Date()
-  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
-  return date >= twoDaysAgo
-}
+  const date = new Date(dateString);
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+  return date >= twoDaysAgo;
+};
 
-async function fetchVehicleStats() {
-  const date = new Date();
-  date.setDate(date.getDate() - 2);
-  const twoDayBeforeToday = date.toISOString();
+// Fetch vehicle stats for a specific token
+async function fetchVehicleStatsForToken(token: string): Promise<SamsaraVehicleUI[]> {
   const url = `https://api.samsara.com/fleet/vehicles/stats?types=engineStates,fuelPercents,gps`;
   let newUrl = url;
-  const result: any = {
+  const result: { data: SamsaraVehicleUI[]; pagination: { endCursor: string; hasNextPage: boolean } } = {
     data: [],
     pagination: {
       endCursor: '',
       hasNextPage: false
     }
-  }
-  try {
+  };
 
+  try {
     while (true) {
-      console.log('ishladi', newUrl);
+      console.log('Fetching:', newUrl);
       const response = await fetch(newUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
-          'Authorization': `Bearer ${process.env.SAMSARA_API_TOKEN}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
       if (!response.ok) {
@@ -57,24 +52,43 @@ async function fetchVehicleStats() {
       }
     }
 
-    // return mapSamsaraResponse(result.data);
-    // sort by result.data.fuelPercent.time
-
-    let data = mapSimpleSamsaraResponse(result.data);
-    data.sort((a, b) => {
-      const timeA = a.fuelPercent?.time ? new Date(a.fuelPercent.time).getTime() : 0
-      const timeB = b.fuelPercent?.time ? new Date(b.fuelPercent.time).getTime() : 0
-      return timeB - timeA
+    // Process the results: map, sort, and filter vehicles from the last two days
+    let vehicles = mapSimpleSamsaraResponse(result.data);
+    vehicles.sort((a, b) => {
+      const timeA = a.fuelPercent?.time ? new Date(a.fuelPercent.time).getTime() : 0;
+      const timeB = b.fuelPercent?.time ? new Date(b.fuelPercent.time).getTime() : 0;
+      return timeB - timeA;
     });
-
-    data = data.filter(
-      (vehicle) => vehicle.fuelPercent && isWithinLastTwoDays(vehicle.fuelPercent.time),
-    )
-
-    return data;
+    vehicles = vehicles.filter(vehicle => vehicle.fuelPercent && isWithinLastTwoDays(vehicle.fuelPercent.time));
+    return vehicles;
   } catch (error) {
-    console.error('Error fetching vehicle stats:', error);
+    console.error('Error fetching vehicle stats for token:', error);
+    return [];
   }
+}
+
+// Fetch vehicle stats from both tokens and merge the results into one array
+async function fetchVehicleStats(): Promise<SamsaraVehicleUI[]> {
+  const token1 = process.env.SAMSARA_API_TOKEN;
+  const token2 = process.env.SAMSARA_API_TOKEN2;
+
+  let data1: SamsaraVehicleUI[] = [];
+  let data2: SamsaraVehicleUI[] = [];
+
+  if (token1) {
+    data1 = await fetchVehicleStatsForToken(token1);
+  } else {
+    console.error("Primary Samsara token (SAMSARA_API_TOKEN) is missing.");
+  }
+
+  if (token2) {
+    data2 = await fetchVehicleStatsForToken(token2);
+  } else {
+    console.log("Secondary Samsara token (SAMSARA_API_TOKEN2) not provided, skipping second source.");
+  }
+
+  // Join the arrays from both tokens
+  return data1.concat(data2);
 }
 
 export function mapSimpleSamsaraResponse(response: SamsaraVehicleUI[]): SamsaraVehicleUI[] {
@@ -100,7 +114,7 @@ export function mapSimpleSamsaraResponse(response: SamsaraVehicleUI[]): SamsaraV
       : {
         time: "",
         latitude: null,
-        longitude:  null,
+        longitude: null,
         headingDegrees: null,
         speedMilesPerHour: null,
         reverseGeo: { formattedLocation: "" },
@@ -136,20 +150,15 @@ export function mapSamsaraResponse(response: SamsaraVehicle[]): SamsaraVehicleUI
       : {
         time: "",
         latitude: null,
-        longitude:  null,
+        longitude: null,
         headingDegrees: null,
         speedMilesPerHour: null,
         reverseGeo: { formattedLocation: "" },
         address: {
-            id: "",
-            name: "",
+          id: "",
+          name: "",
         },
         isEcuSpeed: false,
       },
   }));
 }
-
-
-
-
-
