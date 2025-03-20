@@ -75,3 +75,14 @@ export interface SamsaraResponse {
 export type SortOption = "fuelDesc" | "fuelAsc" | "nameAsc" | "nameDesc" | "fuelTimeDesc"
 export type ViewMode = "card" | "list"
 export type EngineFilter = "All" | "On" | "Off" | "Idle"
+
+
+export interface Preferences {
+  engineFilter: EngineFilter
+
+  sortOption: SortOption
+
+  viewMode: ViewMode
+
+  fleetNameFilters: Record<string, boolean>
+}
