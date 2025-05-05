@@ -187,6 +187,7 @@ export function useVehicleData() {
 
   // Filter and sort vehicles when dependencies change
   useEffect(() => {
+    console.log('Qotoq bosh', sortOption);
     let result = [...vehicles]
 
     // Filter by search query
@@ -237,26 +238,26 @@ export function useVehicleData() {
   }, [vehicles, searchQuery, sortOption, engineFilter, activeFleetFilters])
 
   // Manual refresh handler
-  const handleManualRefresh = () => {
+  const handleManualRefresh = useCallback( () => {
     fetchData(false)
-  }
+  }, [fetchData])
 
   // Toggle all fleet filters
-  const toggleAllFleets = (checked: boolean) => {
+  const toggleAllFleets = useCallback((checked: boolean) => {
     const updatedFilters = { ...fleetNameFilters }
     Object.keys(updatedFilters).forEach((name) => {
       updatedFilters[name] = checked
     })
     setFleetNameFilters(updatedFilters)
-  }
+  }, [fleetNameFilters, setFleetNameFilters]);
 
   // Toggle a single fleet filter
-  const toggleFleetFilter = (name: string, checked: boolean) => {
+  const toggleFleetFilter = useCallback((name: string, checked: boolean) => {
     setFleetNameFilters((prev) => ({
       ...prev,
       [name]: checked,
     }))
-  }
+  }, [setFleetNameFilters])
 
   return {
     vehicles,

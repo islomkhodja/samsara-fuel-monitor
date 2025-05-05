@@ -1,16 +1,16 @@
+import { memo } from "react"
 import { MapPin, Calendar, Truck, Battery, Power } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import type { SamsaraVehicleUI } from "@/app/types"
-import { useFormat } from "@/app/hooks/use-format"
+import { formatTime, getEngineStateVariant } from "@/app/util"
 
 interface VehicleCardProps {
   vehicle: SamsaraVehicleUI
 }
 
-export function VehicleCard({ vehicle }: VehicleCardProps) {
-  const { formatTime, getEngineStateVariant } = useFormat()
-
+// Use React.memo to prevent unnecessary re-renders
+export const VehicleCard = memo(function VehicleCard({ vehicle }: VehicleCardProps) {
   return (
     <div className="transition-all duration-300 transform hover:scale-105">
       <Card className={`overflow-hidden ${(vehicle.fuelPercent?.value || 0) < 20 ? "bg-red-50" : ""}`}>
@@ -73,5 +73,4 @@ export function VehicleCard({ vehicle }: VehicleCardProps) {
       </Card>
     </div>
   )
-}
-
+})

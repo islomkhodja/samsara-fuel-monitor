@@ -1,8 +1,21 @@
+// Check if a date is within the last two days
 export const isWithinLastTwoDays = (dateString: string): boolean => {
   const date = new Date(dateString)
   const twoDaysAgo = new Date()
   twoDaysAgo.setDate(twoDaysAgo.getDate() - 2)
   return date >= twoDaysAgo
+}
+
+// Check if a date is within the last month
+export const isWithinLastMonth = (dateString: string): boolean => {
+  const date = new Date(dateString)
+  const oneMonthAgo = new Date()
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+  return date >= oneMonthAgo
+}
+
+export function log(obj) {
+  return JSON.parse(JSON.stringify(obj))
 }
 
 export const getEngineStateVariant = (state: string): "default" | "outline" | "secondary" => {

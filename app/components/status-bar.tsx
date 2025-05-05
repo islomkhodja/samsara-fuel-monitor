@@ -30,4 +30,3 @@ export function StatusBar({ relativeTimeString, timeUntilRefresh, isRefreshing, 
     </div>
   )
 }
-

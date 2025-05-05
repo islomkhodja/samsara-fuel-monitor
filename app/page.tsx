@@ -1,12 +1,12 @@
 "use client"
 import { AlertCircle } from "lucide-react" // Import AlertCircle from lucide-react
+import { useVehicleData } from "@/app/hooks/use-vehicle-data"
 import { usePreferences } from "@/app/hooks/use-preferences"
 import { FilterBar } from "@/app/components/filter-bar"
 import { StatusBar } from "@/app/components/status-bar"
 import { VehicleGrid } from "@/app/components/vehicle-grid"
 import { VehicleTable } from "@/app/components/vehicle-table"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import {useVehicleData} from "@/app/hooks/use-vehicle-data"; // Remove AlertCircle from this import
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert" // Remove AlertCircle from this import
 
 export default function VehicleStatsPage() {
   const {
@@ -33,7 +33,7 @@ export default function VehicleStatsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">Samsara Fuel Monitor</h1>
+        <h1 className="text-3xl font-bold">Fuel Monitor</h1>
         <p className="text-sm text-muted-foreground mt-1">by Islom Khamid</p>
       </div>
 
@@ -96,4 +96,3 @@ export default function VehicleStatsPage() {
     </div>
   )
 }
-

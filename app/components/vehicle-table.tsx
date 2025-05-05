@@ -1,17 +1,17 @@
+import { memo } from "react"
 import { Truck } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import type { SamsaraVehicleUI } from "@/app/types"
-import { useFormat } from "@/app/hooks/use-format"
+import { formatTime, getEngineStateVariant } from "@/app/util"
 
 interface VehicleTableProps {
   vehicles: SamsaraVehicleUI[]
 }
 
-export function VehicleTable({ vehicles }: VehicleTableProps) {
-  const { formatTime, getEngineStateVariant } = useFormat()
-
+// Use React.memo to prevent unnecessary re-renders
+export const VehicleTable = memo(function VehicleTable({ vehicles }: VehicleTableProps) {
   return (
     <div className="overflow-x-auto">
       <Table>
@@ -69,5 +69,4 @@ export function VehicleTable({ vehicles }: VehicleTableProps) {
       </Table>
     </div>
   )
-}
-
+})

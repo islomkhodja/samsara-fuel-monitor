@@ -9,7 +9,6 @@ export function usePreferences() {
   const [engineFilter, setEngineFilter] = useState<EngineFilter>("All")
   const [fleetNameFilters, setFleetNameFilters] = useState<Record<string, boolean>>({})
   const [isInitialized, setIsInitialized] = useState(false)
-
   // Load preferences from localStorage on initial render
   useEffect(() => {
     const loadPreferences = () => {
@@ -66,4 +65,3 @@ export function usePreferences() {
     isInitialized,
   }
 }
-
