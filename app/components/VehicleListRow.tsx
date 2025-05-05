@@ -31,6 +31,9 @@ export const VehicleListRow = ({vehicle}: { vehicle: SamsaraVehicleUI }) => (
           {Math.round(vehicle.gps.speedMilesPerHour)} mph
         </div>
       )}
+      <div className="text-xs text-muted-foreground mt-1">
+        {vehicle.gps.latitude} {vehicle.gps.longitude}
+      </div>
     </TableCell>
     <TableCell>
       <div className="flex items-center gap-2">
