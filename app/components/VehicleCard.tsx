@@ -24,6 +24,11 @@ export const VehicleCard = ({ vehicle }: { vehicle: SamsaraVehicleUI }) => (
         )}
       </div>
       <div className="flex items-center mb-3 text-sm text-muted-foreground">
+        <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+        <span>{vehicle.gps.latitude}</span>
+        <span> {vehicle.gps.longitude}</span>
+      </div>
+      <div className="flex items-center mb-3 text-sm text-muted-foreground">
         <Calendar className="h-4 w-4 mr-1 flex-shrink-0" />
         <span>Last updated: {formatTime(vehicle.gps.time)}</span>
       </div>

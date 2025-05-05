@@ -5,6 +5,13 @@ export const isWithinLastTwoDays = (dateString: string): boolean => {
   return date >= twoDaysAgo
 }
 
+export const isWithinLastMonth = (dateString: string): boolean => {
+  const date = new Date(dateString)
+  const oneMonthAgo = new Date()
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  return date >= oneMonthAgo
+}
+
 export const getEngineStateVariant = (state: string): "default" | "outline" | "secondary" => {
   switch (state) {
     case "On":

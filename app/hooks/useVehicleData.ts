@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from "react";
 import {SamsaraVehicleUI} from "@/app/types";
-import {isWithinLastTwoDays} from "@/app/util";
+import {isWithinLastMonth} from "@/app/util";
 
 export const useVehicleData = () => {
   const [vehicles, setVehicles] = useState<SamsaraVehicleUI[]>([])
@@ -19,7 +19,7 @@ export const useVehicleData = () => {
 
       setTotalVehicleCount(data.length)
       const recentVehicles = data.filter(
-        (vehicle) => vehicle.fuelPercent && isWithinLastTwoDays(vehicle.fuelPercent.time),
+        (vehicle) => vehicle.fuelPercent && isWithinLastMonth(vehicle.fuelPercent.time),
       )
       setRecentDataCount(recentVehicles.length)
       setVehicles(recentVehicles)

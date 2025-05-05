@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {EngineFilter, SamsaraVehicleUI, SortOption, ViewMode} from "@/app/types"
-import {formatRelativeTime, formatTimeUntilRefresh, isWithinLastTwoDays} from "@/app/util";
+import {formatRelativeTime, formatTimeUntilRefresh, isWithinLastTwoDays, isWithinLastMonth} from "@/app/util";
 import {CardView} from "@/app/components/CardView";
 import {ListView} from "@/app/components/ListView";
 import {FleetFilterDialog} from "@/app/components/FleetFilterDialog";
@@ -39,20 +39,46 @@ export default function VehicleStatsPage() {
   const [engineFilter, setEngineFilter] = useState<EngineFilter>("All")
   const [fleetNameFilters, setFleetNameFilters] = useState<Record<string, boolean>>({})
   const [allFleetNames, setAllFleetNames] = useState<string[]>([])
+  const [isClient, setIsClient] = useState(false)
 
-  // Initialize fleet names based on vehicle data.
+  // Set isClient to true after mount
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // Initialize fleet names and filters
   useEffect(() => {
     const fleetNames = vehicles.map((vehicle) => vehicle.name)
     const uniqueFleetNames = Array.from(new Set(fleetNames))
     setAllFleetNames(uniqueFleetNames)
-    if (Object.keys(fleetNameFilters).length === 0) {
-      const initialFilters: Record<string, boolean> = {}
-      uniqueFleetNames.forEach((name) => {
-        initialFilters[name] = true
-      })
-      setFleetNameFilters(initialFilters)
+
+    if (isClient) {
+      const saved = localStorage.getItem('fleetNameFilters')
+      if (saved) {
+        const savedFilters = JSON.parse(saved)
+        // Merge saved filters with new fleet names
+        const mergedFilters: Record<string, boolean> = {}
+        uniqueFleetNames.forEach(name => {
+          mergedFilters[name] = savedFilters[name] ?? true
+        })
+        setFleetNameFilters(mergedFilters)
+      } else {
+        // Initialize all to true if no saved filters
+        const initialFilters: Record<string, boolean> = {}
+        uniqueFleetNames.forEach(name => {
+          initialFilters[name] = true
+        })
+        setFleetNameFilters(initialFilters)
+      }
     }
-  }, [vehicles, fleetNameFilters])
+  }, [vehicles, isClient])
+
+  // Save fleet filters to localStorage whenever they change
+  useEffect(() => {
+    if (isClient && Object.keys(fleetNameFilters).length > 0) {
+      localStorage.setItem('fleetNameFilters', JSON.stringify(fleetNameFilters))
+    }
+  }, [fleetNameFilters, isClient])
 
   const activeFleetFilters = useMemo(
     () => Object.entries(fleetNameFilters).filter(([_, isChecked]) => isChecked).map(([name]) => name),
@@ -127,7 +153,7 @@ export default function VehicleStatsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">Samsara Fuel Monitor</h1>
+        <h1 className="text-3xl font-bold">Fuel Monitor</h1>
         <p className="text-sm text-muted-foreground mt-1">by Islom Khamid</p>
       </div>
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
@@ -152,7 +178,7 @@ export default function VehicleStatsPage() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle className="text-sm">Recent Data Only</AlertTitle>
             <AlertDescription className="text-xs">
-              Showing {recentDataCount} vehicles with fuel data from the last 2 days.{" "}
+              Showing {recentDataCount} vehicles with fuel data from the last month.{" "}
               {totalVehicleCount - recentDataCount} vehicles with older data have been filtered out.
             </AlertDescription>
           </Alert>
