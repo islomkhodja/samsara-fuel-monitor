@@ -1,6 +1,5 @@
 // Fetch vehicle stats for a specific Samsara token
-import {SamsaraResponse, SamsaraVehicleUI} from "@/app/types";
-import {isWithinLastMonth} from "@/app/util";
+import { SamsaraResponse, SamsaraVehicleUI } from "@/app/types";
 
 export async function fetchVehicleStatsForToken(token: string): Promise<SamsaraVehicleUI[]> {
   const url = `https://api.samsara.com/fleet/vehicles/stats?types=engineStates,fuelPercents,gps`;
@@ -43,27 +42,42 @@ export async function fetchVehicleStatsForToken(token: string): Promise<SamsaraV
   }
 }
 
-// Fetch Samsara vehicle stats from both tokens and merge the results
-export async function fetchVehicleStats(): Promise<SamsaraVehicleUI[]> {
-  const token1 = process.env.SAMSARA_API_TOKEN;
-  const token2 = process.env.SAMSARA_API_TOKEN2;
-
-  let data1: SamsaraVehicleUI[] = [];
-  let data2: SamsaraVehicleUI[] = [];
-
-  if (token1) {
-    data1 = await fetchVehicleStatsForToken(token1);
-  } else {
-    console.error("Primary Samsara token (SAMSARA_API_TOKEN) is missing.");
+// Fetch Samsara vehicle stats from all tokens in parallel
+export async function fetchSamsaraVehicleStats(): Promise<SamsaraVehicleUI[]> {
+  // Get all tokens from environment variables
+  const tokens = process.env.SAMSARA_API_TOKENS?.split(',') || [];
+  
+  if (tokens.length === 0) {
+    console.error("No Samsara API tokens provided. Please set SAMSARA_API_TOKENS environment variable.");
+    return [];
   }
 
-  if (token2) {
-    data2 = await fetchVehicleStatsForToken(token2);
-  } else {
-    console.log("Secondary Samsara token (SAMSARA_API_TOKEN2) not provided, skipping second source.");
-  }
+  try {
+    // Fetch data from all tokens in parallel
+    const results = await Promise.all(
+      tokens.map(token => fetchVehicleStatsForToken(token.trim()))
+    );
 
-  return data1.concat(data2);
+    // Combine all results
+    const allVehicles = results.flat();
+
+    // Remove duplicates based on vehicle ID
+    const uniqueVehicles = Array.from(
+      new Map(allVehicles.map(vehicle => [vehicle.id, vehicle])).values()
+    );
+
+    // Sort by most recent fuel update
+    uniqueVehicles.sort((a, b) => {
+      const timeA = a.fuelPercent?.time ? new Date(a.fuelPercent.time).getTime() : 0;
+      const timeB = b.fuelPercent?.time ? new Date(b.fuelPercent.time).getTime() : 0;
+      return timeB - timeA;
+    });
+
+    return uniqueVehicles;
+  } catch (error) {
+    console.error("Error fetching vehicle stats:", error);
+    return [];
+  }
 }
 
 // Existing mapper for Samsara data

@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Samsara Fuel Monitor App',
-  description: 'by Islom Khamid',
+  title: 'Fuel Monitor App',
+  description: '',
 }
 
 export default function RootLayout({
