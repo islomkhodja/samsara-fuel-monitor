@@ -59,14 +59,14 @@ export default function VehicleStatsPage() {
         // Merge saved filters with new fleet names
         const mergedFilters: Record<string, boolean> = {}
         uniqueFleetNames.forEach(name => {
-          mergedFilters[name] = savedFilters[name] ?? true
+          mergedFilters[name] = savedFilters[name] ?? false
         })
         setFleetNameFilters(mergedFilters)
       } else {
         // Initialize all to true if no saved filters
         const initialFilters: Record<string, boolean> = {}
         uniqueFleetNames.forEach(name => {
-          initialFilters[name] = true
+          initialFilters[name] = false
         })
         setFleetNameFilters(initialFilters)
       }
@@ -154,7 +154,6 @@ export default function VehicleStatsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold">Fuel Monitor</h1>
-        <p className="text-sm text-muted-foreground mt-1">by Islom Khamid</p>
       </div>
       <div className="flex flex-col md:flex-row justify-between items-center mb-6">
         <div className="text-sm text-muted-foreground mb-4 md:mb-0">
